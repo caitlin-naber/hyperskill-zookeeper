@@ -72,7 +72,6 @@ def main_menu():
         balances.update(balance)
         c.execute("INSERT INTO card (number, pin) VALUES (?, ?)", (card_num, pin))
         c.execute("SELECT * FROM card;")
-        print(c.fetchall())
         conn.commit()
         print(f'''Your card has been created
 Your card number:
@@ -85,7 +84,7 @@ Your card pin:
     elif menu_selection == '2':
         card_num = input('Enter your card number:')
         pin = input('Enter your pin:')
-        log_in_2(card_num, pin)
+        log_in(card_num, pin)
         print('')
         menu_2_selection = menu_2(card_num)
         return menu_2_selection
@@ -114,26 +113,27 @@ def menu_2(card_num):
         sys.exit()
     return menu_2_selection
 
-def log_in(card_num, pin):
-    if card_num in accounts and pin == accounts[card_num]:
-            print('You have successfully logged in!')
-    else:
-        print('''Wrong card or PIN!
-        ''')
-        menu_selection = main_menu()
-        return menu_selection
 
-def log_in_2(card_num, pin):
+def log_in(card_num, pin):
     conn = sqlite3.connect('card.s3db')
     c = conn.cursor()
-    check_pin = c.execute("SELECT pin FROM card WHERE number = (?)", (card_num,))
-    query_pin = (c.fetchall()[0])
-    pin = (pin,)
-    if pin == query_pin:
-        print("You have successfully logged in!")
-        menu_selection = menu_2(card_num)
+    c.execute("SELECT * FROM card WHERE number = (?)", (card_num,))
+    cards = (c.fetchall())
+    if cards == []:
+        print("Wrong card or PIN!")
+        menu_selection = main_menu()
+        return menu_selection
+    if card_num in cards[0][1]:
+        query_pin = cards[0][2]
+        if pin == query_pin:
+            print("You have successfully logged in!")
+            menu_selection = menu_2(card_num)
+        else:
+            print('''Wrong PIN!
+            ''')
+            menu_selection = main_menu()
     else:
-        print('''Wrong card or PIN!
+        print('''Wrong card!
         ''')
         menu_selection = main_menu()
     return menu_selection
@@ -142,7 +142,7 @@ def log_in_2(card_num, pin):
 def check_balance(card_num):
     conn = sqlite3.connect('card.s3db')
     c = conn.cursor()
-    get_balance = c.execute("SELECT balance FROM card WHERE number = (?)", (card_num,))
+    c.execute("SELECT balance FROM card WHERE number = (?)", (card_num,))
     balance = c.fetchall()[0]
     balance_only = balance[0]
     if balance_only == None:
@@ -166,3 +166,5 @@ menu_selection = main_menu()
 
 while menu_selection != '0':
     menu_selection = main_menu()
+
+#TODO: ensure goes to correct menu after incorrect login followed by new account

@@ -66,10 +66,6 @@ def main_menu():
         new_account = Account()
         card_num = new_account.generate_card_num()
         pin = new_account.generate_pin()
-        account = {card_num: pin}
-        balance = {card_num: '0'}
-        accounts.update(account)
-        balances.update(balance)
         c.execute("INSERT INTO card (number, pin) VALUES (?, ?)", (card_num, pin))
         c.execute("SELECT * FROM card;")
         conn.commit()
@@ -85,9 +81,6 @@ Your card pin:
         card_num = input('Enter your card number:')
         pin = input('Enter your pin:')
         log_in(card_num, pin)
-        print('')
-        menu_2_selection = menu_2(card_num)
-        return menu_2_selection
     else:
         print('Bye!')
         sys.exit()
@@ -147,7 +140,7 @@ def check_balance(card_num):
     balance_only = balance[0]
     if balance_only == None:
         balance_only = '0'
-    print('Balance: ' + balance_only)
+    print('Balance: ' + str(balance_only))
 
 conn = sqlite3.connect('card.s3db')
 c = conn.cursor()
@@ -159,12 +152,9 @@ c.execute('''CREATE TABLE IF NOT EXISTS card (
     );
     ''')
 
-accounts = {}
-balances = {}
 
 menu_selection = main_menu()
 
 while menu_selection != '0':
     menu_selection = main_menu()
-
-#TODO: ensure goes to correct menu after incorrect login followed by new account
+    

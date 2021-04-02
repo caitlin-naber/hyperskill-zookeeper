@@ -2,6 +2,7 @@ num_apps = int(input())
 num_accepts = int(input())
 students = []
 
+
 def accepted_students(students):
     counter = 0
     while counter < num_accepts:
@@ -24,5 +25,3 @@ students = sorted(students, key=lambda students: (-students[1], students[0]))
 
 print('Successful applicants:')
 accepted_students(students)
-
-# TODO: resolve ties, same GPAs should be sorted alpha order, use lambda for key
